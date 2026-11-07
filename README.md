@@ -1,7 +1,7 @@
 # Continual Test-Time Domain Adaptation (CoTTA) — Term Project
 
-Kho mã nguồn thực nghiệm môn **Nhập môn Học máy (Introduction to Machine Learning)** của **Team 3 - Lớp 24KHMT1**.
-Thành viên nhóm 3:
+Kho mã nguồn thực nghiệm môn **Nhập môn Học máy (Introduction to Machine Learning)** của **Team 3 - Lớp 24KHMT1**.  
+Thành viên nhóm 3:  
 Nguyễn Minh Khôi - 24127066  
 Võ Ngọc Thịnh - 24127246  
 Lê Lâm Huy - 24127394
