@@ -1,0 +1,20 @@
+project_name: "IntroML-CoTTA"
+dataset: "cifar100c"
+arch: "Hendrycks2020AugMix_ResNeXt"  # ResNeXt-29_32x4d trên RobustBench
+num_classes: 100
+severity: 5
+batch_size: 200
+seed: 42
+
+optimizer:
+  type: "Adam"
+  lr: 0.001
+  beta: 0.9
+
+cotta:
+  ema_alpha: 0.999
+  restoration_p: 0.01
+  confidence_threshold: 0.72  # Ngưỡng p_th = 0.72 cho CIFAR-100-C
+  num_augmentations: 32
+  restoration_mode: "random"
+  loss_type: "ce"

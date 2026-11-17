@@ -1,0 +1,20 @@
+project_name: "IntroML-CoTTA"
+dataset: "cifar10c"
+arch: "Standard"              # WideResNet-28-10 trên RobustBench
+num_classes: 10
+severity: 5
+batch_size: 200
+seed: 42
+
+optimizer:
+  type: "Adam"
+  lr: 0.001
+  beta: 0.9
+
+cotta:
+  ema_alpha: 0.999            # Hệ số trung bình trượt hàm mũ của Teacher (alpha)
+  restoration_p: 0.01         # Xác suất khôi phục trọng số Bernoulli (p)
+  confidence_threshold: 0.92  # Ngưỡng tự tin mô hình nguồn (p_th)
+  num_augmentations: 32       # Số phép biến đổi ảnh tăng cường (N)
+  restoration_mode: "random"  # "random" (CoTTA gốc) hoặc "gradient_guided" (Critique 1)
+  loss_type: "ce"             # "ce" (Cross-Entropy chuẩn) hoặc "symmetric_ce" (Đối chiếu code gốc)
