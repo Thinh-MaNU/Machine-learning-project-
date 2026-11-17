@@ -8,13 +8,12 @@ Thực hiện 2 thí nghiệm chứng minh điểm yếu lý thuyết của mặ
 import argparse
 import copy
 import random
-from typing import Callable, Dict, List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
-import torchvision.transforms as T
 
 try:
     import wandb
@@ -22,6 +21,7 @@ try:
 except ImportError:
     WANDB_AVAILABLE = False
 
+from src.augmentations import build_cotta_augmenter
 from src.cotta import CoTTA, configure_model_for_cotta
 
 
@@ -40,21 +40,6 @@ def set_random_seed(seed: int) -> None:
     torch.backends.cudnn.benchmark = False
 
 
-def build_default_augmenter() -> Callable[[torch.Tensor], torch.Tensor]:
-    """Khởi tạo hàm biến đổi ảnh tăng cường ngẫu nhiên phục vụ nhãn giả Teacher.
-
-    Returns:
-        Callable[[torch.Tensor], torch.Tensor]: Hàm nhận batch tensor (B, C, H, W)
-            và trả về batch ảnh đã biến đổi ngẫu nhiên.
-    """
-    transform = T.Compose([
-        T.RandomHorizontalFlip(p=0.5),
-        T.RandomCrop(32, padding=4),
-        T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
-    ])
-    return transform
-
-
 def evaluate_continual_stream(
     base_model: nn.Module,
     domain_loaders: Dict[str, DataLoader],
@@ -67,7 +52,8 @@ def evaluate_continual_stream(
     num_augmentations: int = 32,
     seed: int = 42,
     use_wandb: bool = False,
-    project_name: str = "IntroML-CoTTA",
+    wandb_entity: str = "huyle1156-hcmus",
+    project_name: str = "cotta-reproduction",
 ) -> Dict[str, float]:
     """Chạy đánh giá CoTTA xuyên suốt chuỗi các miền nhiễu liên tục và ghi nhận Error Rate.
 
@@ -83,6 +69,7 @@ def evaluate_continual_stream(
         num_augmentations (int): Số phép biến đổi tăng cường N (mặc định: 32).
         seed (int): Hạt giống ngẫu nhiên của lượt chạy.
         use_wandb (bool): Bật/tắt việc đẩy kết quả lên Weights & Biases.
+        wandb_entity (str): Tên team/entity trên Weights & Biases.
         project_name (str): Tên dự án trên Weights & Biases.
 
     Returns:
@@ -92,7 +79,7 @@ def evaluate_continual_stream(
 
     model = configure_model_for_cotta(copy.deepcopy(base_model)).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(0.9, 0.999))
-    augment_fn = build_default_augmenter()
+    augment_fn = build_cotta_augmenter(image_size=32)
 
     cotta_adapter = CoTTA(
         model=model,
@@ -108,8 +95,10 @@ def evaluate_continual_stream(
     run_name = f"critique1_{restoration_mode}_p{restoration_p}_seed{seed}"
     if use_wandb and WANDB_AVAILABLE:
         wandb.init(
+            entity=wandb_entity,
             project=project_name,
             name=run_name,
+            group="lab2_critique1_restoration",
             config={
                 "experiment": "critique_1_restoration",
                 "restoration_mode": restoration_mode,
@@ -177,8 +166,9 @@ def create_smoke_test_environment() -> Tuple[nn.Module, Dict[str, DataLoader]]:
     for domain in ["gaussian_noise", "defocus_blur", "fog"]:
         x = torch.rand(64, 3, 32, 32)
         y = torch.randint(0, 10, (64,))
-        loaders[domain] = DataLoader(TensorDataset(
-            x, y), batch_size=32, shuffle=False)
+        loaders[domain] = DataLoader(
+            TensorDataset(x, y), batch_size=32, shuffle=False
+        )
 
     return dummy_model, loaders
 
@@ -186,13 +176,17 @@ def create_smoke_test_environment() -> Tuple[nn.Module, Dict[str, DataLoader]]:
 def main() -> None:
     """Hàm điều phối chạy Thí nghiệm 1A (Sensitivity Sweep) và 1B (Guided vs Random)."""
     parser = argparse.ArgumentParser(
-        description="Chạy thực nghiệm Critique 1 cho CoTTA")
-    parser.add_argument("--smoke-test", action="store_true",
-                        help="Chạy kiểm thử nhanh bằng dữ liệu giả lập")
-    parser.add_argument("--use-wandb", action="store_true",
-                        help="Đẩy log thực nghiệm lên W&B")
-    parser.add_argument("--seeds", type=int, nargs="+",
-                        default=[42, 43, 44], help="Danh sách random seeds")
+        description="Chạy thực nghiệm Critique 1 cho CoTTA"
+    )
+    parser.add_argument(
+        "--smoke-test", action="store_true", help="Chạy kiểm thử nhanh bằng dữ liệu giả lập"
+    )
+    parser.add_argument(
+        "--use-wandb", action="store_true", help="Đẩy log thực nghiệm lên W&B"
+    )
+    parser.add_argument(
+        "--seeds", type=int, nargs="+", default=[42, 43, 44], help="Danh sách random seeds"
+    )
     parser.add_argument(
         "--p-values",
         type=float,
@@ -209,15 +203,13 @@ def main() -> None:
         base_model, domain_loaders = create_smoke_test_environment()
         num_augs = 4
     else:
-        # Khi Thành viên 2 hoàn thành src/datasets.py, tự động nạp CIFAR-10-C và RobustBench
-        from robustbench.utils import load_model
-        from src.datasets import get_cifar10c_continual_loaders
+        import src.utils as utils_module
+        from experiments.reproduce_cifar10c import load_domain_loaders_compat
 
-        base_model = load_model(model_name="Standard",
-                                dataset="cifar10", threat_model="corruptions")
-        domain_loaders = get_cifar10c_continual_loaders(
-            batch_size=200, severity=5)
-        num_augs = 32
+        cfg = utils_module.load_config("configs/default.yaml")
+        base_model = utils_module.load_source_model(cfg)
+        domain_loaders = dict(load_domain_loaders_compat(cfg))
+        num_augs = int(cfg.get("num_aug", 32))
 
     print("\n=== THÍ NGHIỆM 1A & 1B: SO SÁNH RANDOM vs. GRADIENT-GUIDED RESTORATION ===")
     for mode in ["random", "gradient_guided"]:
@@ -239,7 +231,8 @@ def main() -> None:
             mean_err = float(np.mean(seed_errors))
             std_err = float(np.std(seed_errors))
             print(
-                f"Mode: {mode:15s} | p = {p:<6.3f} | Mean Error: {mean_err:.2f}% ± {std_err:.2f}%")
+                f"Mode: {mode:15s} | p = {p:<6.3f} | Mean Error: {mean_err:.2f}% ± {std_err:.2f}%"
+            )
 
 
 if __name__ == "__main__":

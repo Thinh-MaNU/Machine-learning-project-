@@ -302,3 +302,52 @@ class CoTTA(nn.Module):
             torch.Tensor: Dự đoán xác suất từ Teacher, kích thước (B, num_classes).
         """
         return self.forward_and_adapt(x)
+
+
+def build_cotta_from_config(
+    model: nn.Module,
+    cfg: Dict[str, object],
+    augment_fn: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
+    use_aug: bool = True,
+    use_restore: bool = True,
+    restoration_mode: str = "random",
+    loss_type: str = "ce",
+) -> CoTTA:
+    """Khởi tạo đối tượng CoTTA trực tiếp từ từ điển cấu hình YAML của nhóm.
+
+    Hỗ trợ các cờ use_aug và use_restore để chạy thực nghiệm cắt bỏ (Ablation Study - Table 2).
+
+    Args:
+        model (nn.Module): Mô hình tiền huấn luyện trên miền nguồn.
+        cfg (Dict[str, object]): Từ điển cấu hình đọc từ configs/default.yaml hoặc cifar100c.yaml.
+        augment_fn (Optional[Callable]): Hàm biến đổi ảnh từ src/augmentations.py.
+        use_aug (bool): Bật/tắt Augmentation-Averaged Pseudo-Labels (False -> num_augmentations=0).
+        use_restore (bool): Bật/tắt Stochastic Restoration (False -> restoration_p=0.0).
+        restoration_mode (str): "random" (mặc định) hoặc "gradient_guided" (Lab 2).
+        loss_type (str): "ce" (đúng Eq. 5 bài báo) hoặc "symmetric_ce" (đối chiếu code gốc).
+
+    Returns:
+        CoTTA: Đối tượng bộ thích nghi CoTTA đã cấu hình sẵn sàng chạy online.
+    """
+    configured_model = configure_model_for_cotta(model)
+    optimizer = torch.optim.Adam(
+        configured_model.parameters(),
+        lr=float(cfg.get("lr", 0.001)),
+        betas=(0.9, 0.999),
+    )
+
+    effective_num_aug = int(cfg.get("num_aug", 32)) if use_aug else 0
+    effective_restore_p = float(
+        cfg.get("restore_p", 0.01)) if use_restore else 0.0
+
+    return CoTTA(
+        model=configured_model,
+        optimizer=optimizer,
+        augment_fn=augment_fn if use_aug else None,
+        ema_alpha=float(cfg.get("alpha", 0.999)),
+        restoration_p=effective_restore_p,
+        confidence_threshold=float(cfg.get("p_th", 0.92)),
+        num_augmentations=effective_num_aug,
+        restoration_mode=restoration_mode,
+        loss_type=loss_type,
+    )
