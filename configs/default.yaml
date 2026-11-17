@@ -1,0 +1,21 @@
+dataset: "cifar10"
+hf_repo_id: "YashP54/cifar10-c"
+data_dir: "./data/cifar10c"
+model_dir: "./models"
+model_name: "Standard"
+threat_model: "corruptions"
+
+batch_size: 200
+severity: 5
+seed: 42
+
+# Hyperparameters CoTTA
+lr: 0.001
+alpha: 0.999
+p_th: 0.92
+restore_p: 0.01
+num_aug: 32
+
+# W&B Tracking (Chung cho cả nhóm)
+wandb_entity: "huyle1156-hcmus"
+wandb_project: "cotta-reproduction"

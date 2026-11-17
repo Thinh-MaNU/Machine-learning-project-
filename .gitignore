@@ -218,3 +218,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Runtime data, model weights, and W&B logs
+data/
+models/
+checkpoints/
+wandb/
+*.npy
+*.tar
+*.pth
+*.pt
+.env
