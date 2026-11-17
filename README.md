@@ -48,6 +48,7 @@ pip install -r requirements.txt
 - `huggingface_hub`: Tự động tải về và giải nén dữ liệu CIFAR10-C / CIFAR100-C trong lúc chạy (programmatic dataset loading).
 - `wandb`: Lưu cấu hình, metrics và biểu đồ từng lượt chạy lên dự án công khai Weights & Biases (`huyle1156-hcmus/cotta-reproduction`).
 - `pyyaml`, `tqdm`, `matplotlib`: Đọc file cấu hình `.yaml`, hiển thị thanh tiến trình và vẽ biểu đồ phân tích.
+- `autoattack`: Gói phụ thuộc bắt buộc của `robustbench` khi nạp các mô hình chuẩn.
 
 ## 5. Hướng dẫn Chạy Thực nghiệm
 *(Đang cập nhật theo tiến độ Lab 1)*
@@ -55,4 +56,5 @@ pip install -r requirements.txt
 ## 6. Bảng ánh xạ Thực nghiệm (W&B Mapping Table)
 | Thực nghiệm | Script / Notebook | Link W&B Run | Tóm tắt kết quả |
 | :--- | :--- | :--- | :--- |
-| *(Đang cập nhật...)* | | | |                   # Notebooks chạy Colab và trực quan hóa
+| CIFAR10-C Source Sanity Check | `notebooks/colab_runner.ipynb` | [cifar10-source-check](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/5m9wlthi) | Mean error 43.51% (khớp 43.5% Table 2 bài báo) |
+| CIFAR100-C Source Sanity Check | `notebooks/colab_runner.ipynb` | [cifar100-source-check](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/4qqig06d) | Mean error 46.45% (khớp 46.4% Table 4 bài báo) |
