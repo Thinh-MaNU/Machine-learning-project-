@@ -47,48 +47,56 @@ CORRUPTION_ORDER: List[str] = [
 
 
 def load_domain_loaders_compat(cfg: Dict[str, object]) -> List[Tuple[str, DataLoader]]:
-    """Gọi hàm nạp dữ liệu CIFAR-10-C từ src/datasets.py của nhóm một cách tương thích.
+    """Tải dữ liệu từ Hugging Face và khởi tạo danh sách 15 DataLoader từ src/datasets.py."""
+    data_root = str(cfg.get("data_dir", "./data/cifar10c"))
 
-    Args:
-        cfg (Dict[str, object]): Từ điển cấu hình đọc từ configs/default.yaml.
+    if hasattr(ds_module, "prepare_dataset_from_hf"):
+        prep_sig = inspect.signature(ds_module.prepare_dataset_from_hf)
+        prep_pool = {
+            "cfg": cfg,
+            "config": cfg,
+            "hf_repo_id": cfg.get("hf_repo_id", "YashP54/cifar10-c"),
+            "repo_id": cfg.get("hf_repo_id", "YashP54/cifar10-c"),
+            "data_dir": data_root,
+            "data_root": data_root,
+            "local_dir": data_root,
+            "save_dir": data_root,
+            "cache_dir": data_root,
+            "dataset": cfg.get("dataset", "cifar10"),
+            "dataset_name": cfg.get("dataset", "cifar10"),
+        }
+        prep_kwargs = {k: prep_pool[k]
+                       for k in prep_sig.parameters if k in prep_pool}
+        returned_path = ds_module.prepare_dataset_from_hf(**prep_kwargs)
+        if returned_path is not None:
+            data_root = str(returned_path)
 
-    Returns:
-        List[Tuple[str, DataLoader]]: Danh sách tuần tự (tên_miền_nhiễu, DataLoader).
-    """
-    # Tìm hàm loader chuẩn trong src/datasets.py của Thành viên 2
-    candidate_names = [
-        "get_cifar10c_loaders",
-        "get_corrupted_loaders",
-        "load_cifar10c_continual",
-        "build_continual_loaders",
-    ]
-    loader_fn = None
-    for name in candidate_names:
-        if hasattr(ds_module, name):
-            loader_fn = getattr(ds_module, name)
-            break
+    corruptions = getattr(ds_module, "CORRUPTIONS_ORDER", CORRUPTION_ORDER)
+    loader_sig = inspect.signature(ds_module.load_corruption_dataloader)
+    domain_loaders: List[Tuple[str, DataLoader]] = []
 
-    if loader_fn is None:
-        available = [n for n in dir(ds_module) if not n.startswith("_")]
-        raise AttributeError(
-            f"Không tìm thấy hàm loader chuẩn trong src/datasets.py. "
-            f"Các hàm hiện có: {available}. Hãy cập nhật tên hàm trong load_domain_loaders_compat()."
-        )
+    for corr_name in corruptions:
+        arg_pool = {
+            "cfg": cfg,
+            "config": cfg,
+            "data_root": data_root,
+            "data_dir": data_root,
+            "root": data_root,
+            "corruption": corr_name,
+            "corruption_name": corr_name,
+            "domain": corr_name,
+            "name": corr_name,
+            "severity": int(cfg.get("severity", 5)),
+            "batch_size": int(cfg.get("batch_size", 200)),
+            "shuffle": False,
+            "dataset": cfg.get("dataset", "cifar10"),
+        }
+        kwargs = {k: arg_pool[k]
+                  for k in loader_sig.parameters if k in arg_pool}
+        loader = ds_module.load_corruption_dataloader(**kwargs)
+        domain_loaders.append((corr_name, loader))
 
-    sig = inspect.signature(loader_fn)
-    if "cfg" in sig.parameters or "config" in sig.parameters:
-        key = "cfg" if "cfg" in sig.parameters else "config"
-        raw_loaders = loader_fn(**{key: cfg})
-    else:
-        raw_loaders = loader_fn(
-            data_dir=cfg.get("data_dir", "./data/cifar10c"),
-            batch_size=int(cfg.get("batch_size", 200)),
-            severity=int(cfg.get("severity", 5)),
-        )
-
-    if isinstance(raw_loaders, dict):
-        return list(raw_loaders.items())
-    return list(raw_loaders)
+    return domain_loaders
 
 
 def run_single_ablation_experiment(
@@ -202,6 +210,34 @@ def run_single_ablation_experiment(
     return results
 
 
+def load_source_model_compat(cfg: Dict[str, object], device: torch.device) -> torch.nn.Module:
+    """Tự động khớp tham số và gọi hàm load_source_model() từ src/utils.py của nhóm.
+
+    Args:
+        cfg (Dict[str, object]): Từ điển cấu hình đọc từ file YAML.
+        device (torch.device): Thiết bị thực thi (cuda hoặc cpu).
+
+    Returns:
+        torch.nn.Module: Mô hình nguồn tiền huấn luyện đã chuyển sang thiết bị tính toán.
+    """
+    sig = inspect.signature(utils_module.load_source_model)
+    arg_pool = {
+        "cfg": cfg,
+        "config": cfg,
+        "dataset": cfg.get("dataset", "cifar10"),
+        "model_name": cfg.get("model_name", "Standard"),
+        "model_dir": cfg.get("model_dir", "./models"),
+        "threat_model": cfg.get("threat_model", "corruptions"),
+        "device": device,
+    }
+    kwargs = {
+        param_name: arg_pool[param_name]
+        for param_name in sig.parameters
+        if param_name in arg_pool
+    }
+    return utils_module.load_source_model(**kwargs).to(device)
+
+
 def main() -> None:
     """Điều phối chạy tái lập Bảng 2 và lưu báo cáo số liệu ra thư mục outputs/."""
     parser = argparse.ArgumentParser(
@@ -220,7 +256,7 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Thiết bị thực thi: {device}")
 
-    base_model = utils_module.load_source_model(cfg)
+    base_model = load_source_model_compat(cfg, device)
     domain_loaders = load_domain_loaders_compat(cfg)
 
     variants = [
