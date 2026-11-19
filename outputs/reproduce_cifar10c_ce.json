@@ -1,58 +1,86 @@
 {
-    "weight_and_aug": {
-        "paper_mean_error": 17.4,
-        "ours_mean_error": 20.19,
-        "ours_std_error": 0.0,
-        "relative_deviation_pct": 16.03,
-        "runs": [
-            {
-                "gaussian_noise": 27.04,
-                "shot_noise": 23.92,
-                "impulse_noise": 33.18,
-                "defocus_blur": 14.02,
-                "glass_blur": 32.51,
-                "motion_blur": 14.89,
-                "zoom_blur": 14.3,
-                "snow": 18.5,
-                "frost": 17.93,
-                "fog": 16.45,
-                "brightness": 10.5,
-                "contrast": 15.5,
-                "elastic_transform": 23.26,
-                "pixelate": 17.01,
-                "jpeg_compression": 23.89,
-                "mean_error": 20.19,
-                "paper_error": 17.4,
-                "relative_deviation_pct": 16.05
-            }
-        ]
-    },
-    "full_cotta": {
-        "paper_mean_error": 16.2,
-        "ours_mean_error": 17.74,
-        "ours_std_error": 0.0,
-        "relative_deviation_pct": 9.51,
-        "runs": [
-            {
-                "gaussian_noise": 27.08,
-                "shot_noise": 23.93,
-                "impulse_noise": 32.93,
-                "defocus_blur": 12.49,
-                "glass_blur": 30.71,
-                "motion_blur": 12.5,
-                "zoom_blur": 10.97,
-                "snow": 15.28,
-                "frost": 14.79,
-                "fog": 12.87,
-                "brightness": 7.87,
-                "contrast": 11.02,
-                "elastic_transform": 19.62,
-                "pixelate": 14.05,
-                "jpeg_compression": 19.96,
-                "mean_error": 17.74,
-                "paper_error": 16.2,
-                "relative_deviation_pct": 9.49
-            }
-        ]
-    }
+  "weight_avg_only": {
+    "paper_mean_error": 18.3,
+    "ours_mean_error": 18.34,
+    "ours_std_error": 0.0,
+    "relative_deviation_pct": 0.22,
+    "runs": [
+      {
+        "gaussian_noise": 26.95,
+        "shot_noise": 23.22,
+        "impulse_noise": 30.9,
+        "defocus_blur": 12.19,
+        "glass_blur": 29.77,
+        "motion_blur": 14.07,
+        "zoom_blur": 11.84,
+        "snow": 17.49,
+        "frost": 16.46,
+        "fog": 14.83,
+        "brightness": 9.55,
+        "contrast": 12.93,
+        "elastic_transform": 19.42,
+        "pixelate": 15.55,
+        "jpeg_compression": 19.88,
+        "mean_error": 18.34,
+        "paper_error": 18.3,
+        "relative_deviation_pct": 0.2
+      }
+    ]
+  },
+  "weight_and_aug": {
+    "paper_mean_error": 17.4,
+    "ours_mean_error": 19.33,
+    "ours_std_error": 0.0,
+    "relative_deviation_pct": 11.09,
+    "runs": [
+      {
+        "gaussian_noise": 23.06,
+        "shot_noise": 19.59,
+        "impulse_noise": 28.66,
+        "defocus_blur": 15.36,
+        "glass_blur": 28.81,
+        "motion_blur": 16.36,
+        "zoom_blur": 15.3,
+        "snow": 17.91,
+        "frost": 17.14,
+        "fog": 16.52,
+        "brightness": 10.54,
+        "contrast": 20.64,
+        "elastic_transform": 21.4,
+        "pixelate": 17.92,
+        "jpeg_compression": 20.7,
+        "mean_error": 19.33,
+        "paper_error": 17.4,
+        "relative_deviation_pct": 11.08
+      }
+    ]
+  },
+  "full_cotta": {
+    "paper_mean_error": 16.2,
+    "ours_mean_error": 17.15,
+    "ours_std_error": 0.0,
+    "relative_deviation_pct": 5.86,
+    "runs": [
+      {
+        "gaussian_noise": 23.03,
+        "shot_noise": 19.65,
+        "impulse_noise": 29.11,
+        "defocus_blur": 14.01,
+        "glass_blur": 28.17,
+        "motion_blur": 13.91,
+        "zoom_blur": 12.42,
+        "snow": 15.03,
+        "frost": 14.17,
+        "fog": 12.97,
+        "brightness": 7.67,
+        "contrast": 15.73,
+        "elastic_transform": 18.6,
+        "pixelate": 14.34,
+        "jpeg_compression": 18.45,
+        "mean_error": 17.15,
+        "paper_error": 16.2,
+        "relative_deviation_pct": 5.87
+      }
+    ]
+  }
 }
