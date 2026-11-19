@@ -2,6 +2,7 @@
 
 Cài đặt bám sát Mục 4.1 của bài báo CoTTA (CVPR 2022), bao gồm:
 Color Jitter, Random Affine, Gaussian Blur, Random Horizontal Flip và Gaussian Noise.
+Đã tinh chỉnh cường độ nhẹ phù hợp với ảnh kích thước nhỏ 32x32 (CIFAR-10/100).
 """
 
 from typing import Callable
@@ -46,17 +47,21 @@ def build_cotta_augmenter(image_size: int = 32) -> Callable[[torch.Tensor], torc
         Callable[[torch.Tensor], torch.Tensor]: Hàm nhận batch tensor (B, C, H, W)
             và trả về batch ảnh đã qua biến đổi ngẫu nhiên.
     """
-    pad_size = max(1, image_size // 4)
+    _ = image_size
     return T.Compose([
-        T.Pad(padding=pad_size, padding_mode="reflect"),
         T.RandomAffine(
-            degrees=(-15, 15),
-            translate=(0.0625, 0.0625),
-            scale=(0.9, 1.1),
+            degrees=(-8, 8),
+            translate=(0.04, 0.04),
+            scale=(0.95, 1.05),
         ),
-        T.RandomCrop(size=(image_size, image_size)),
-        T.GaussianBlur(kernel_size=3, sigma=(0.001, 0.5)),
-        T.ColorJitter(brightness=0.2, contrast=0.3, saturation=0.3, hue=0.1),
+        T.RandomApply(
+            [T.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.05)],
+            p=0.5,
+        ),
+        T.RandomApply(
+            [T.GaussianBlur(kernel_size=3, sigma=(0.1, 0.4))],
+            p=0.3,
+        ),
         T.RandomHorizontalFlip(p=0.5),
         AddGaussianNoise(std=0.005),
     ])

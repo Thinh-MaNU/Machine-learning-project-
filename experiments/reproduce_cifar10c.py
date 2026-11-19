@@ -13,6 +13,7 @@ import argparse
 import copy
 import inspect
 import json
+import sys                                                     
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -25,6 +26,10 @@ try:
     WANDB_AVAILABLE = True
 except ImportError:
     WANDB_AVAILABLE = False
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1])) 
+
 
 import src.datasets as ds_module
 import src.utils as utils_module
