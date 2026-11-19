@@ -1,0 +1,74 @@
+[
+  {
+    "param": "p_th",
+    "value": 0.75,
+    "wandb_run_id": "9thhpvyb",
+    "mean_error": 17.49,
+    "avg_aug_trigger_pct": 0.0,
+    "per_corruption": {
+      "gaussian_noise": 27.2,
+      "shot_noise": 23.85,
+      "impulse_noise": 32.34,
+      "defocus_blur": 11.89,
+      "glass_blur": 30.56,
+      "motion_blur": 12.74,
+      "zoom_blur": 10.65,
+      "snow": 15.39,
+      "frost": 14.76,
+      "fog": 12.93,
+      "brightness": 7.47,
+      "contrast": 10.7,
+      "elastic_transform": 18.4,
+      "pixelate": 13.98,
+      "jpeg_compression": 19.55
+    }
+  },
+  {
+    "param": "p_th",
+    "value": 0.92,
+    "wandb_run_id": "8kit55s6",
+    "mean_error": 17.15,
+    "avg_aug_trigger_pct": 73.33,
+    "per_corruption": {
+      "gaussian_noise": 23.03,
+      "shot_noise": 19.65,
+      "impulse_noise": 29.11,
+      "defocus_blur": 14.01,
+      "glass_blur": 28.17,
+      "motion_blur": 13.91,
+      "zoom_blur": 12.42,
+      "snow": 15.03,
+      "frost": 14.17,
+      "fog": 12.97,
+      "brightness": 7.67,
+      "contrast": 15.73,
+      "elastic_transform": 18.6,
+      "pixelate": 14.34,
+      "jpeg_compression": 18.45
+    }
+  },
+  {
+    "param": "p_th",
+    "value": 0.98,
+    "wandb_run_id": "zaoavopc",
+    "mean_error": 17.43,
+    "avg_aug_trigger_pct": 99.07,
+    "per_corruption": {
+      "gaussian_noise": 23.03,
+      "shot_noise": 19.63,
+      "impulse_noise": 29.22,
+      "defocus_blur": 14.11,
+      "glass_blur": 28.39,
+      "motion_blur": 14.7,
+      "zoom_blur": 12.72,
+      "snow": 14.98,
+      "frost": 14.16,
+      "fog": 13.86,
+      "brightness": 8.56,
+      "contrast": 16.59,
+      "elastic_transform": 18.62,
+      "pixelate": 14.57,
+      "jpeg_compression": 18.35
+    }
+  }
+]
