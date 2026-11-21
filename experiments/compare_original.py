@@ -3,7 +3,7 @@
 Thực hiện:
 1. Chạy bản tự cài đặt của nhóm (src/cotta.py) với hai cấu hình hàm mất mát:
    - loss_type="ce": bám sát Phương trình (5) in trong bài báo CoTTA.
-   - loss_type="symmetric_ce": đối chiếu cơ chế Symmetric Cross-Entropy trong code gốc.
+   - loss_type="symmetric_ce": đối chiếu biến thể Symmetric Cross-Entropy (dùng ở nhánh ImageNet trong imagenet/cotta.py của qinenergy/cotta; nhánh CIFAR dùng CE một chiều).
 2. So sánh từng bước/từng miền (kèm đối chiếu đầu ra JSON hoặc log chạy từ repo gốc
    qinenergy/cotta được clone tách biệt ngoài thư mục dự án) để khoanh vùng điểm rẽ nhánh.
 """
@@ -53,7 +53,7 @@ def run_loss_variant(
         domain_loaders: Danh sách 15 DataLoader chuẩn bị sẵn.
         cfg (Dict[str, object]): Cấu hình đọc từ configs/default.yaml.
         device (torch.device): Thiết bị thực thi (CUDA/CPU).
-        loss_type (str): 'ce' (theo Eq. 5 bài báo) hoặc 'symmetric_ce' (theo code gốc).
+        loss_type (str): 'ce' (theo Eq. 5 & CIFAR qinenergy/cotta) hoặc 'symmetric_ce' (nhánh ImageNet của qinenergy/cotta).
         seed (int): Hạt giống ngẫu nhiên.
         use_wandb (bool): Bật/tắt ghi log lên W&B.
 
@@ -160,7 +160,7 @@ def main() -> None:
     if ours_ce is None:
         ours_ce = run_loss_variant(base_model, domain_loaders, cfg, device, "ce", args.seed, not args.no_wandb)
 
-    print("\n>>> Đang chạy Ours với Symmetric Cross-Entropy (cơ chế trong code gốc qinenergy/cotta) <<<")
+    print("\n>>> Đang chạy Ours với Symmetric Cross-Entropy (biến thể nhánh ImageNet của qinenergy/cotta) <<<")
     ours_sym = run_loss_variant(base_model, domain_loaders, cfg, device, "symmetric_ce", args.seed, not args.no_wandb)
 
     official_summary = None
@@ -174,7 +174,7 @@ def main() -> None:
         "ours_symmetric_ce_official_loss": ours_sym,
         "official_repo_run": official_summary,
         "key_divergence_points": [
-            "1. Loss function: Bài báo Eq. (5) viết Cross-Entropy một chiều, trong khi code gốc (cotta.py) dùng Symmetric Cross-Entropy 0.5*(CE(y', y_hat) + CE(y_hat, y')).",
+            "1. Loss & Aggregation: Nhánh CIFAR của code gốc (cifar/cotta.py) dùng CE một chiều nhưng gộp logits trước softmax, còn bản nhóm gộp xác suất; Symmetric Cross-Entropy xuất hiện ở nhánh ImageNet (imagenet/cotta.py) của qinenergy/cotta (giúp bản nhóm giảm lỗi từ 17.15% xuống 16.95%).",
             "2. Anchor model BN stats: Cần giữ nguyên eval() & running_stats nguồn cho anchor_model f_{theta_0}; nếu xóa running_stats sẽ làm sai lệch confidence gating.",
             "3. Augmentation parameters: Bài báo không công bố cường độ chi tiết của 5 phép biến đổi trên ảnh 32x32.",
             "4. Confidence threshold p_th: Giá trị cụ thể (0.92 cho CIFAR10-C) bị ẩn khỏi bản chính, chỉ nhắc tới trong phụ lục và code gốc.",

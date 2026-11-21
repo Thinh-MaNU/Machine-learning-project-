@@ -4,7 +4,7 @@
     "value": 0.0,
     "wandb_run_id": "9m2w2ey8",
     "mean_error": 19.33,
-    "avg_aug_trigger_pct": 73.33,
+    "avg_aug_trigger_pct": 67.6,
     "per_corruption": {
       "gaussian_noise": 23.06,
       "shot_noise": 19.59,
@@ -28,7 +28,7 @@
     "value": 0.01,
     "wandb_run_id": "8kit55s6",
     "mean_error": 17.15,
-    "avg_aug_trigger_pct": 73.33,
+    "avg_aug_trigger_pct": 67.6,
     "per_corruption": {
       "gaussian_noise": 23.03,
       "shot_noise": 19.65,

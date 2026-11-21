@@ -74,7 +74,7 @@ python experiments/reproduce_cifar100c.py --config configs/cifar100c.yaml --seed
 python experiments/sensitivity_sweep.py --config configs/default.yaml --param p_th --values 0.75 0.98
 python experiments/sensitivity_sweep.py --config configs/default.yaml --param restore_p --values 0.05 0.1
 
-# 4. Đối chiếu bản sạch (Eq. 5 CE) vs cơ chế code gốc (Symmetric CE)
+# 4. Đối chiếu bản sạch (CE theo Eq. 5) vs biến thể Symmetric CE (nhánh ImageNet của code gốc)
 python experiments/compare_original.py --config configs/default.yaml --seed 42
 ```
 
@@ -85,13 +85,13 @@ Dự án W&B công khai: https://wandb.ai/huyle1156-hcmus/cotta-reproduction
 | :--- | :--- | :--- | :--- |
 | CIFAR10-C Source Sanity Check | `notebooks/colab_runner.ipynb` | [cifar10-source-check](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/5m9wlthi) | Mean error 43.51% (khớp 43.5% Table 2) |
 | CIFAR100-C Source Sanity Check | `notebooks/colab_runner.ipynb` | [cifar100-source-check](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/4qqig06d) | Mean error 46.45% (khớp 46.4% Table 4) |
-| CIFAR10-C CoTTA (Weight-avg only) | `experiments/reproduce_cifar10c.py` | [weight_avg_only](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/91dbhath) | Mean error 18.34% (Paper: 18.30%, +0.22%) |
-| CIFAR10-C CoTTA (Weight + Aug) | `experiments/reproduce_cifar10c.py` | [weight_and_aug](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/9m2w2ey8) | Mean error 19.33% (Paper: 17.40%, +11.09%) |
-| CIFAR10-C CoTTA (Full, CE Eq. 5) | `experiments/reproduce_cifar10c.py` | [full_cotta_ce](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/8kit55s6) | Mean error 17.15% (Paper: 16.20%, +5.86%) |
+| CIFAR10-C CoTTA (Weight-avg only) | `experiments/reproduce_cifar10c.py` | [weight_avg_only](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/91dbhath) | Mean error 18.34% (Paper: 18.30%, +0.20%) |
+| CIFAR10-C CoTTA (Weight + Aug) | `experiments/reproduce_cifar10c.py` | [weight_and_aug](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/9m2w2ey8) | Mean error 19.33% (Paper: 17.40%, +11.08%) |
+| CIFAR10-C CoTTA (Full, CE Eq. 5) | `experiments/reproduce_cifar10c.py` | [full_cotta_ce](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/8kit55s6) | Mean error 17.15% (Paper: 16.20%, +5.87%) |
 | CIFAR100-C CoTTA (Full, ResNeXt-29) | `experiments/reproduce_cifar100c.py` | [cifar100c_full_cotta](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/5z82bzl5) | Mean error 31.37% (Paper: 32.50%, -3.49%) |
 | Sensitivity Sweep (`p_th = 0.75`) | `experiments/sensitivity_sweep.py` | [sweep_p_th_0.75](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/9thhpvyb) | Mean error 17.49% (0.0% aug triggered) |
 | Sensitivity Sweep (`p_th = 0.98`) | `experiments/sensitivity_sweep.py` | [sweep_p_th_0.98](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/zaoavopc) | Mean error 17.43% (99.07% aug triggered) |
 | Sensitivity Sweep (`restore_p = 0.05`) | `experiments/sensitivity_sweep.py` | [sweep_restore_0.05](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/nlc5r5kr) | Mean error 17.42% (khôi phục hơi mạnh) |
 | Sensitivity Sweep (`restore_p = 0.10`) | `experiments/sensitivity_sweep.py` | [sweep_restore_0.1](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/i73pmako) | Mean error 17.79% (cản trở thích nghi) |
-| Đối chiếu code gốc (Ours Symmetric CE) | `experiments/compare_original.py` | [ours_symmetric_ce](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/7go1891l) | Mean error 16.95% (+4.63% vs 16.20%) |
+| Đối chiếu hàm loss (Ours Symmetric CE) | `experiments/compare_original.py` | [ours_symmetric_ce](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/7go1891l) | Mean error 16.95% (+4.63% vs 16.20%) |
 | Đối chiếu code gốc (`qinenergy/cotta`) | `Official Repo (Colab T4)` | [official_repo_cotta](https://wandb.ai/huyle1156-hcmus/cotta-reproduction/runs/9oygx2c5) | Mean error 16.42% (+1.36% vs 16.20%) |
